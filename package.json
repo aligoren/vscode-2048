@@ -1,0 +1,88 @@
+{
+  "name": "vscode-2048",
+  "displayName": "2048 Game",
+  "description": "Play the classic 2048 tile-sliding puzzle game directly in VSCode",
+  "version": "1.0.1",
+  "publisher": "AliGOREN",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aligoren/vscode-2048.git"
+  },
+  "homepage": "https://github.com/aligoren/vscode-2048#readme",
+  "bugs": {
+    "url": "https://github.com/aligoren/vscode-2048/issues"
+  },
+  "license": "MIT",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "game",
+    "2048",
+    "puzzle",
+    "entertainment"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "2048GameView",
+          "title": "2048 Game",
+          "icon": "$(game)"
+        }
+      ]
+    },
+    "views": {
+      "2048GameView": [
+        {
+          "id": "2048Game",
+          "name": "2048 Game",
+          "type": "webview",
+          "when": "true"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "2048Game.newGame",
+        "title": "New Game",
+        "category": "2048"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "npx vitest run",
+    "test:performance": "npx vitest run src/performance.test.ts",
+    "test:memory": "npx vitest run src/memoryCleanup.test.ts",
+    "test:themes": "npx vitest run src/themeCompatibility.test.ts",
+    "test:startup": "npx vitest run src/startupPerformance.test.ts",
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "publish:patch": "vsce publish patch",
+    "publish:minor": "vsce publish minor",
+    "publish:major": "vsce publish major"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vitest/ui": "^3.2.4",
+    "@vscode/test-electron": "^2.2.0",
+    "@vscode/vsce": "^2.22.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4",
+    "vitest": "^3.2.4"
+  }
+}
