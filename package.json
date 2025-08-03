@@ -2,7 +2,7 @@
   "name": "vscode-2048",
   "displayName": "2048 Game",
   "description": "Play the classic 2048 tile-sliding puzzle game directly in VSCode",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "AliGOREN",
   "repository": {
     "type": "git",
