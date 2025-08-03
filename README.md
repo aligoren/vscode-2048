@@ -2,6 +2,8 @@
 
 🎮 Classic 2048 tile-sliding puzzle game directly in your VSCode editor!
 
+2028 on Visual Studio Marketplace: https://marketplace.visualstudio.com/items?itemName=AliGOREN.vscode-2048
+
 ![2048 Game Screenshot](/images/screenshot.png)
 
 ## Features
