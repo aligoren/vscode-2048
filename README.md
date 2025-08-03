@@ -2,7 +2,7 @@
 
 🎮 Classic 2048 tile-sliding puzzle game directly in your VSCode editor!
 
-![2048 Game Screenshot](https://via.placeholder.com/600x400/1e1e1e/ffffff?text=2048+Game+Screenshot)
+![2048 Game Screenshot](/images/screenshot.png)
 
 ## Features
 
@@ -66,13 +66,13 @@
 ## Screenshots
 
 ### Dark Theme
-![Dark Theme](https://via.placeholder.com/400x300/1e1e1e/ffffff?text=Dark+Theme)
+![Dark Theme](/images/screenshot_dark.png)
 
 ### Light Theme  
-![Light Theme](https://via.placeholder.com/400x300/ffffff/000000?text=Light+Theme)
+![Light Theme](/images/screenshot.png)
 
 ### High Contrast
-![High Contrast](https://via.placeholder.com/400x300/000000/ffffff?text=High+Contrast)
+![High Contrast](/images/screenshot_high_constract.png)
 
 ## Configuration
 
