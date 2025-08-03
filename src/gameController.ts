@@ -217,6 +217,11 @@ export class GameController {
                 case 'requestSavedGame':
                     this.loadAndSendSavedGame();
                     break;
+                case 'shareScore':
+                    if (message.shareData) {
+                        this.handleShareScore(message.shareData);
+                    }
+                    break;
                 default:
                     console.log('Unknown message type in GameController:', message.type);
             }
@@ -395,6 +400,129 @@ export class GameController {
             }
         } catch (error) {
             console.error('Error initializing game controller:', error);
+        }
+    }
+
+    /**
+     * Handle share score request from webview
+     */
+    private async handleShareScore(shareData: any): Promise<void> {
+        try {
+            if (!shareData || !shareData.score) {
+                console.error('Invalid share data received');
+                return;
+            }
+
+            const { score, highestTile, moveCount, gameState, imageData } = shareData;
+            
+            // Show platform selection
+            const platform = await vscode.window.showQuickPick([
+                { label: '🐦 Twitter/X', value: 'twitter' },
+                { label: '💼 LinkedIn', value: 'linkedin' },
+                { label: '📋 Copy to Clipboard', value: 'clipboard' },
+                { label: '📱 Discord', value: 'discord' }
+            ], {
+                placeHolder: 'Choose platform to share your score'
+            });
+
+            if (!platform) {
+                return; // User cancelled
+            }
+
+            await this.shareToplatform(platform.value, {
+                score,
+                highestTile,
+                moveCount,
+                gameState,
+                imageData
+            });
+
+        } catch (error) {
+            console.error('Error handling share score:', error);
+            vscode.window.showErrorMessage('Failed to share score. Please try again.');
+        }
+    }
+
+    /**
+     * Share score to selected platform
+     */
+    private async shareToplatform(platform: string, data: any): Promise<void> {
+        try {
+            const { score, highestTile, gameState } = data;
+            
+            let shareText = '';
+            let shareUrl = '';
+
+            // Generate share text based on game state
+            if (gameState === 'won') {
+                shareText = `🎉 Just reached ${highestTile} in 2048! Final score: ${score} 🎮 Playing right in VSCode! #VSCode #2048Game #Coding`;
+            } else if (gameState === 'lost') {
+                shareText = `🎮 Just scored ${score} in 2048! Highest tile: ${highestTile} 🔥 Taking a coding break in VSCode! #VSCode #2048Game #Coding`;
+            } else {
+                shareText = `🎮 Currently playing 2048 in VSCode! Score: ${score}, Highest: ${highestTile} 🚀 #VSCode #2048Game #Coding`;
+            }
+
+            switch (platform) {
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+                    await vscode.env.openExternal(vscode.Uri.parse(shareUrl));
+                    break;
+
+                case 'linkedin':
+                    const linkedinText = `Taking a quick coding break with 2048! 🎮 Score: ${score} | Playing directly in VSCode. Sometimes the best debugging happens during game breaks! 😄 #VSCode #CodingLife #2048`;
+                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://github.com/aligoren/vscode-2048')}&summary=${encodeURIComponent(linkedinText)}`;
+                    await vscode.env.openExternal(vscode.Uri.parse(shareUrl));
+                    break;
+
+                case 'discord':
+                    const discordText = `🎮 **2048 in VSCode!** 🎮\n\n📊 **Score:** ${score}\n🎯 **Highest Tile:** ${highestTile}\n🎲 **Status:** ${gameState === 'won' ? 'Victory! 🎉' : gameState === 'lost' ? 'Game Over 😅' : 'Still Playing 🔥'}\n\n*Playing right in my code editor! Check it out:* https://github.com/aligoren/vscode-2048`;
+                    await vscode.env.clipboard.writeText(discordText);
+                    vscode.window.showInformationMessage('Discord message copied to clipboard! 📋 Paste it in your Discord channel.');
+                    break;
+
+                case 'clipboard':
+                    const clipboardText = `🎮 2048 Game Results 🎮\n\nScore: ${score}\nHighest Tile: ${highestTile}\nStatus: ${gameState}\n\nPlayed in VSCode with the 2048 extension!\nGet it here: https://github.com/aligoren/vscode-2048`;
+                    await vscode.env.clipboard.writeText(clipboardText);
+                    vscode.window.showInformationMessage('Score details copied to clipboard! 📋');
+                    break;
+
+                default:
+                    console.error('Unknown platform:', platform);
+            }
+
+            // Show success message
+            if (platform !== 'clipboard' && platform !== 'discord') {
+                vscode.window.showInformationMessage(`Score shared to ${platform}! 🚀`);
+            }
+
+        } catch (error) {
+            console.error('Error sharing to platform:', error);
+            vscode.window.showErrorMessage(`Failed to share to ${platform}. Please try again.`);
+        }
+    }
+
+    /**
+     * Public method to trigger share from command palette
+     */
+    public async shareCurrentScore(): Promise<void> {
+        try {
+            if (!this.gameEngine) {
+                vscode.window.showWarningMessage('No active game to share. Start a new game first!');
+                return;
+            }
+
+            const gameState = this.gameEngine.getGameState();
+            await this.handleShareScore({
+                score: gameState.score,
+                highestTile: this.gameEngine.getHighestTile(),
+                moveCount: gameState.moveCount,
+                gameState: gameState.gameState,
+                imageData: null // Will be enhanced later with screenshot
+            });
+
+        } catch (error) {
+            console.error('Error sharing current score:', error);
+            vscode.window.showErrorMessage('Failed to share score. Please try again.');
         }
     }
 

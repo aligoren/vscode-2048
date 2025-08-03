@@ -400,6 +400,8 @@ export function activate(context: vscode.ExtensionContext) {
             }
             
             let newGameCommand: vscode.Disposable | undefined;
+            let shareScoreCommand: vscode.Disposable | undefined;
+            
             try {
                 // Register the new game command with error handling
                 newGameCommand = vscode.commands.registerCommand('2048Game.newGame', errorHandler.wrap(() => {
@@ -407,6 +409,17 @@ export function activate(context: vscode.ExtensionContext) {
                     vscode.window.showInformationMessage('New 2048 game started!');
                 }, 'NEW_GAME_COMMAND_ERROR', { command: '2048Game.newGame' }));
                 console.log('New game command registered successfully');
+            } catch (error) {
+                errorHandler.handleError(error as Error, 'COMMAND_REGISTRATION_ERROR');
+                // Continue without command
+            }
+
+            try {
+                // Register the share score command with error handling
+                shareScoreCommand = vscode.commands.registerCommand('2048Game.shareScore', errorHandler.wrap(() => {
+                    gameController.shareCurrentScore();
+                }, 'SHARE_SCORE_COMMAND_ERROR', { command: '2048Game.shareScore' }));
+                console.log('Share score command registered successfully');
             } catch (error) {
                 errorHandler.handleError(error as Error, 'COMMAND_REGISTRATION_ERROR');
                 // Continue without command
@@ -432,6 +445,9 @@ export function activate(context: vscode.ExtensionContext) {
             }
             if (newGameCommand) {
                 disposables.push(newGameCommand);
+            }
+            if (shareScoreCommand) {
+                disposables.push(shareScoreCommand);
             }
             
             context.subscriptions.push(...disposables);

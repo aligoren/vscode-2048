@@ -53,6 +53,11 @@
         "command": "2048Game.newGame",
         "title": "New Game",
         "category": "2048"
+      },
+      {
+        "command": "2048Game.shareScore",
+        "title": "Share Score",
+        "category": "2048"
       }
     ]
   },

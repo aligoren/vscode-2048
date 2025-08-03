@@ -31,10 +31,20 @@ export interface ThemeData {
 }
 
 // Messages sent from webview to extension
+// Share data interface
+export interface ShareData {
+    score: number;
+    highestTile: number;
+    moveCount: number;
+    gameState: 'playing' | 'won' | 'lost';
+    imageData?: string; // Base64 encoded screenshot
+}
+
 export interface WebviewToExtensionMessage extends BaseMessage {
-    type: 'requestNewGame' | 'gameMove' | 'gameStateUpdate' | 'requestTheme' | 'requestSavedGame' | 'error';
+    type: 'requestNewGame' | 'gameMove' | 'gameStateUpdate' | 'requestTheme' | 'requestSavedGame' | 'shareScore' | 'error';
     direction?: 'up' | 'down' | 'left' | 'right';
     state?: GameState;
+    shareData?: ShareData;
     error?: {
         message: string;
         stack?: string;

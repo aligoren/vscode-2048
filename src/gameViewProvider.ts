@@ -567,26 +567,53 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                     color: var(--vscode-editor-foreground);
                 }
 
-                /* New Game button */
-                .new-game-btn {
+                /* Game buttons */
+                .game-buttons {
+                    display: flex;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+
+                .game-btn {
                     background-color: var(--vscode-button-background);
                     color: var(--vscode-button-foreground);
                     border: none;
-                    padding: 10px 20px;
+                    padding: 8px 16px;
                     border-radius: var(--border-radius);
                     cursor: pointer;
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 600;
                     transition: background-color 0.2s ease;
-                    min-width: 100px;
+                    min-width: 80px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 4px;
                 }
                 
-                .new-game-btn:hover {
+                .game-btn:hover {
                     background-color: var(--vscode-button-hoverBackground);
                 }
 
-                .new-game-btn:active {
+                .game-btn:active {
                     transform: translateY(1px);
+                }
+
+                .game-btn:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+                .share-btn {
+                    background-color: var(--vscode-button-secondaryBackground, var(--vscode-input-background));
+                    color: var(--vscode-button-secondaryForeground, var(--vscode-input-foreground));
+                    border: 1px solid var(--vscode-input-border);
+                }
+
+                .share-btn:hover:not(:disabled) {
+                    background-color: var(--vscode-input-background);
+                    border-color: var(--vscode-focusBorder);
                 }
 
                 /* Game board container */
@@ -919,8 +946,12 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                     box-shadow: 0 0 0 var(--hc-focus-width) var(--vscode-focusBorder);
                 }
 
-                .high-contrast .new-game-btn {
+                .high-contrast .game-btn {
                     border: var(--hc-border-width) solid var(--vscode-button-foreground);
+                }
+
+                .high-contrast .share-btn {
+                    border: var(--hc-border-width) solid var(--vscode-input-foreground);
                 }
 
                 .high-contrast .score-container {
@@ -967,9 +998,14 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                         <div class="score-label">Score</div>
                         <div class="score-value" id="score">0</div>
                     </div>
-                    <button class="new-game-btn" onclick="requestNewGame()" title="Start a new game">
-                        New Game
-                    </button>
+                    <div class="game-buttons">
+                        <button class="game-btn" onclick="requestNewGame()" title="Start a new game">
+                            🎮 New Game
+                        </button>
+                        <button class="game-btn share-btn" id="shareBtn" onclick="shareScore()" title="Share your score">
+                            📸 Share
+                        </button>
+                    </div>
                 </div>
 
                 <div class="game-board-container">
@@ -2045,6 +2081,99 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                         console.error('Error requesting theme:', error);
                     }
                 }
+
+                function shareScore() {
+                    try {
+                        // Get current game state from UI
+                        const scoreElement = document.getElementById('score');
+                        const statusElement = document.getElementById('gameStatus');
+                        
+                        if (!scoreElement) {
+                            uiRenderer.showError('Unable to get current score');
+                            return;
+                        }
+
+                        const score = parseInt(scoreElement.textContent || '0');
+                        const statusText = statusElement?.textContent || '';
+                        
+                        // Determine game state from status text
+                        let gameState = 'playing';
+                        if (statusText.includes('won') || statusText.includes('🎉')) {
+                            gameState = 'won';
+                        } else if (statusText.includes('Over') || statusText.includes('😞')) {
+                            gameState = 'lost';
+                        }
+
+                        // Get highest tile from board
+                        let highestTile = 0;
+                        const tiles = document.querySelectorAll('.tile:not(.empty)');
+                        tiles.forEach(tile => {
+                            const value = parseInt(tile.textContent || '0');
+                            if (value > highestTile) {
+                                highestTile = value;
+                            }
+                        });
+
+                        // Capture screenshot of game board
+                        const gameBoard = document.getElementById('gameBoard');
+                        let imageData = null;
+                        
+                        if (gameBoard) {
+                            try {
+                                // Create a canvas to capture the game board
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                
+                                if (ctx) {
+                                    const rect = gameBoard.getBoundingClientRect();
+                                    canvas.width = rect.width * 2; // High DPI
+                                    canvas.height = rect.height * 2;
+                                    ctx.scale(2, 2);
+                                    
+                                    // Set background
+                                    ctx.fillStyle = getComputedStyle(gameBoard).backgroundColor || '#faf8ef';
+                                    ctx.fillRect(0, 0, rect.width, rect.height);
+                                    
+                                    // This is a simplified approach - in a real implementation,
+                                    // we'd need to render the tiles manually or use html2canvas library
+                                    imageData = canvas.toDataURL('image/png');
+                                }
+                            } catch (error) {
+                                console.warn('Could not capture screenshot:', error);
+                                // Continue without screenshot
+                            }
+                        }
+
+                        // Send share request to extension
+                        vscode.postMessage({
+                            type: 'shareScore',
+                            shareData: {
+                                score: score,
+                                highestTile: highestTile,
+                                moveCount: 0, // We don't track this in UI currently
+                                gameState: gameState,
+                                imageData: imageData
+                            }
+                        });
+
+                        // Provide user feedback
+                        const shareBtn = document.getElementById('shareBtn');
+                        if (shareBtn) {
+                            const originalText = shareBtn.innerHTML;
+                            shareBtn.innerHTML = '✨ Sharing...';
+                            shareBtn.disabled = true;
+                            
+                            setTimeout(() => {
+                                shareBtn.innerHTML = originalText;
+                                shareBtn.disabled = false;
+                            }, 2000);
+                        }
+
+                    } catch (error) {
+                        console.error('Error sharing score:', error);
+                        uiRenderer.showError('Failed to share score');
+                    }
+                }
                 
                 function showError(message) {
                     uiRenderer.showError(message);
@@ -2155,6 +2284,22 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                                     // Update keyboard handler state
                                     if (keyboardHandler) {
                                         keyboardHandler.setGameActive(isGameActive);
+                                    }
+
+                                    // Update share button state
+                                    const shareBtn = document.getElementById('shareBtn');
+                                    if (shareBtn) {
+                                        // Enable share button when there's a score to share
+                                        const hasScore = message.state.score > 0;
+                                        shareBtn.disabled = !hasScore;
+                                        
+                                        if (message.state.gameState === 'won') {
+                                            shareBtn.innerHTML = '🎉 Share Victory!';
+                                        } else if (message.state.gameState === 'lost') {
+                                            shareBtn.innerHTML = '📸 Share Score';
+                                        } else {
+                                            shareBtn.innerHTML = '📸 Share';
+                                        }
                                     }
                                 }
                                 break;
