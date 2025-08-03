@@ -71,7 +71,7 @@ export class MessageValidator {
             return false;
         }
 
-        const validTypes = ['requestNewGame', 'gameMove', 'gameStateUpdate', 'requestTheme', 'requestSavedGame', 'error'];
+        const validTypes = ['requestNewGame', 'gameMove', 'gameStateUpdate', 'requestTheme', 'requestSavedGame', 'shareScore', 'error'];
         if (!validTypes.includes(message.type)) {
             return false;
         }
@@ -84,6 +84,10 @@ export class MessageValidator {
             
             case 'gameStateUpdate':
                 return message.state && MessageValidator.isValidGameState(message.state);
+            
+            case 'shareScore':
+                return message.shareData && typeof message.shareData === 'object' && 
+                       typeof message.shareData.score === 'number';
             
             case 'error':
                 return message.error && typeof message.error.message === 'string';

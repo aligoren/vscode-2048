@@ -219,7 +219,11 @@ export class GameController {
                     break;
                 case 'shareScore':
                     if (message.shareData) {
-                        this.handleShareScore(message.shareData);
+                        // Handle async method safely
+                        this.handleShareScore(message.shareData).catch(error => {
+                            console.error('Error in handleShareScore:', error);
+                            this.handleError('Failed to share score', 'SHARE_SCORE_ERROR');
+                        });
                     }
                     break;
                 default:

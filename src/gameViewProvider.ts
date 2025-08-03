@@ -155,6 +155,9 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                 case 'requestSavedGame':
                     this.handleSavedGameRequest(webviewMessage);
                     break;
+                case 'shareScore':
+                    this.handleShareScore(webviewMessage);
+                    break;
                 case 'error':
                     this.handleWebviewError(webviewMessage);
                     break;
@@ -238,6 +241,27 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
         } catch (error) {
             console.error('Error handling saved game request:', error);
             this.sendErrorMessage('Failed to load saved game', 'SAVED_GAME_ERROR');
+        }
+    }
+
+    private handleShareScore(message: WebviewToExtensionMessage): void {
+        try {
+            if (!message.shareData) {
+                this.sendErrorMessage('Share score missing share data', 'INVALID_SHARE_DATA');
+                return;
+            }
+
+            // Forward to game controller if available
+            if (this._gameController) {
+                this._gameController.handleMessage(message);
+            } else {
+                console.log('Share score request:', message.shareData);
+                this.sendErrorMessage('Game controller not available', 'CONTROLLER_UNAVAILABLE');
+            }
+
+        } catch (error) {
+            console.error('Error handling share score:', error);
+            this.sendErrorMessage('Failed to process share request', 'SHARE_PROCESSING_ERROR');
         }
     }
 
