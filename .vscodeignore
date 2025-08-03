@@ -1,0 +1,107 @@
+# VSCode Extension Ignore File
+# Files and folders to exclude from the extension package
+
+# Source files
+src/**
+.vscode/**
+.vscode-test/**
+
+# Build files
+tsconfig.json
+tslint.json
+.eslintrc.json
+
+# Test files
+**/*.test.ts
+**/*.test.js
+**/test/**
+tests/**
+coverage/**
+
+# Development files
+.gitignore
+.gitattributes
+webpack.config.js
+vite.config.js
+vitest.config.ts
+
+# Documentation (keep README.md, LICENSE, CHANGELOG.md)
+docs/**
+*.md
+!README.md
+!CHANGELOG.md
+
+# Dependencies
+node_modules/**
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE files
+.idea/**
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/**
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+.nyc_output/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# Kiro IDE files
+.kiro/**
+
+# Temporary files
+tmp/**
+temp/**
+
+# Package files
+*.vsix
+
+# Git files
+.git/**
+.gitmodules
+
+# CI/CD files
+.github/**
+.travis.yml
+.circleci/**
+azure-pipelines.yml
+
+# Publishing guide (development only)
+PUBLISHING_GUIDE.md
+CONTRIBUTING.md
+QUICK_START.md
+create_icon.py
