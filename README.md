@@ -138,7 +138,7 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ## Changelog
 
-### [1.0.0] - 2024-01-XX
+### [1.0.0] - 2025-01-03
 - Initial release
 - Complete 2048 game implementation
 - VSCode theme integration
