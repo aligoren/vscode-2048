@@ -2,6 +2,26 @@
 
 All notable changes to the "2048 Game" extension will be documented in this file.
 
+## [1.0.5] - 2025-01-08
+
+### Added
+- 🎯 **Social Media Sharing Feature**: Share your 2048 scores on Twitter/X and copy to clipboard
+- 📱 **Smart Share Button**: Disabled until game starts, prevents accidental sharing
+- 🐦 **Twitter Integration**: Multi-line prefilled tweets with score, highest tile, and marketplace link
+- 📋 **Clipboard Support**: Copy formatted score details for manual sharing
+- 🎮 **Enhanced User Experience**: VSCode QuickPick menu for platform selection
+
+### Technical
+- Added secure browser opening from webview to prevent VSCode crashes
+- Implemented message validation for share functionality
+- Added comprehensive error handling for share operations
+- Optimized share text formatting with proper line breaks and emojis
+
+### Fixed
+- Resolved VSCode crash issues when opening external URLs
+- Fixed share button state management
+- Improved message passing between webview and extension host
+
 ## [1.0.0] - 2025-01-03
 
 ### Added

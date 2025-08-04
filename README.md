@@ -13,6 +13,7 @@
 - Score tracking and game state persistence
 - Win/lose detection with visual feedback
 - Keyboard controls (Arrow keys or WASD)
+- 🎯 **Social Media Sharing**: Share your scores on Twitter/X or copy to clipboard
 
 🎨 **VSCode Integration**
 - Seamless integration with VSCode themes (Dark, Light, High Contrast)
