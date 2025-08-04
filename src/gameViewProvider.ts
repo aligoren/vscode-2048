@@ -244,26 +244,6 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
         }
     }
 
-    private handleShareScore(message: WebviewToExtensionMessage): void {
-        try {
-            if (!message.shareData) {
-                this.sendErrorMessage('Share score missing share data', 'INVALID_SHARE_DATA');
-                return;
-            }
-
-            // Forward to game controller
-            if (this._gameController) {
-                this._gameController.handleMessage(message);
-            } else {
-                this.sendErrorMessage('Game controller not available', 'CONTROLLER_UNAVAILABLE');
-            }
-
-        } catch (error) {
-            console.error('Error handling share score:', error);
-            this.sendErrorMessage('Failed to process share request', 'SHARE_PROCESSING_ERROR');
-        }
-    }
-
     private handleWebviewError(message: WebviewToExtensionMessage): void {
         try {
             console.error('Error reported by webview:', message.error);

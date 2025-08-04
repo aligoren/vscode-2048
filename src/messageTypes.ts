@@ -87,9 +87,6 @@ export class MessageValidator {
             case 'gameStateUpdate':
                 return message.state && MessageValidator.isValidGameState(message.state);
             
-            case 'shareScore':
-                return message.shareData && typeof message.shareData === 'object';
-            
             case 'error':
                 return message.error && typeof message.error.message === 'string';
             
