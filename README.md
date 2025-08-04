@@ -2,7 +2,7 @@
 
 🎮 Classic 2048 tile-sliding puzzle game directly in your VSCode editor!
 
-2028 on Visual Studio Marketplace: https://marketplace.visualstudio.com/items?itemName=AliGOREN.vscode-2048
+2048 on Visual Studio Marketplace: https://marketplace.visualstudio.com/items?itemName=AliGOREN.vscode-2048
 
 ![2048 Game Screenshot](/images/screenshot.png)
 
@@ -140,6 +140,13 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 6. Submit a pull request
 
 ## Changelog
+
+### [1.0.5] - 2025-01-08
+- 🎯 **Social Media Sharing Feature**: Share your 2048 scores on Twitter/X and copy to clipboard
+- 📱 **Smart Share Button**: Disabled until game starts, prevents accidental sharing
+- 🐦 **Twitter Integration**: Multi-line prefilled tweets with score, highest tile, and marketplace link
+- 📋 **Clipboard Support**: Copy formatted score details for manual sharing
+- 🎮 **Enhanced User Experience**: VSCode QuickPick menu for platform selection
 
 ### [1.0.0] - 2025-01-03
 - Initial release
