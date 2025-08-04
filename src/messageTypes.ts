@@ -54,9 +54,11 @@ export interface WebviewToExtensionMessage extends BaseMessage {
 
 // Messages sent from extension to webview
 export interface ExtensionToWebviewMessage extends BaseMessage {
-    type: 'newGame' | 'gameStateUpdate' | 'themeChanged' | 'error' | 'gameStateChanged';
+    type: 'newGame' | 'gameStateUpdate' | 'themeChanged' | 'error' | 'gameStateChanged' | 'openBrowser';
     state?: GameState;
     theme?: ThemeData;
+    url?: string;
+    platform?: string;
     error?: {
         message: string;
         code?: string;
@@ -71,7 +73,7 @@ export class MessageValidator {
             return false;
         }
 
-        const validTypes = ['requestNewGame', 'gameMove', 'gameStateUpdate', 'requestTheme', 'requestSavedGame', 'error'];
+        const validTypes = ['requestNewGame', 'gameMove', 'gameStateUpdate', 'requestTheme', 'requestSavedGame', 'shareScore', 'error'];
         if (!validTypes.includes(message.type)) {
             return false;
         }
@@ -98,7 +100,7 @@ export class MessageValidator {
             return false;
         }
 
-        const validTypes = ['newGame', 'gameStateUpdate', 'themeChanged', 'error', 'gameStateChanged'];
+        const validTypes = ['newGame', 'gameStateUpdate', 'themeChanged', 'error', 'gameStateChanged', 'openBrowser'];
         if (!validTypes.includes(message.type)) {
             return false;
         }
@@ -112,6 +114,9 @@ export class MessageValidator {
             
             case 'themeChanged':
                 return message.theme && MessageValidator.isValidThemeData(message.theme);
+            
+            case 'openBrowser':
+                return typeof message.url === 'string';
             
             case 'error':
                 return message.error && typeof message.error.message === 'string';

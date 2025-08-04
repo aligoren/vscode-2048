@@ -155,6 +155,9 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                 case 'requestSavedGame':
                     this.handleSavedGameRequest(webviewMessage);
                     break;
+                case 'shareScore':
+                    this.handleShareScore(webviewMessage);
+                    break;
                 case 'error':
                     this.handleWebviewError(webviewMessage);
                     break;
@@ -1002,7 +1005,7 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                         <button class="game-btn" onclick="requestNewGame()" title="Start a new game">
                             🎮 New Game
                         </button>
-                        <button class="game-btn share-btn" id="shareBtn" onclick="shareScore()" title="Share your score">
+                        <button class="game-btn share-btn" id="shareBtn" onclick="shareScore()" title="Share your score" disabled>
                             📸 Share
                         </button>
                     </div>
@@ -2233,6 +2236,9 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                                 } else {
                                     console.warn('Keyboard handler not available');
                                 }
+                                
+                                // Enable share button
+                                document.getElementById('shareBtn').disabled = false;
                                 break;
                                 
                             case 'gameStateUpdate':
@@ -2309,6 +2315,29 @@ export class GameViewProvider implements vscode.WebviewViewProvider {
                                     throw new Error('Theme change message missing theme data');
                                 }
                                 uiRenderer.updateTheme(message.theme);
+                                break;
+                                
+                            case 'openBrowser':
+                                if (!message.url) {
+                                    console.error('openBrowser message missing URL');
+                                    return;
+                                }
+                                
+                                // Open URL in new tab/window - safe from webview
+                                try {
+                                    const link = document.createElement('a');
+                                    link.href = message.url;
+                                    link.target = '_blank';
+                                    link.rel = 'noopener noreferrer';
+                                    link.style.display = 'none';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    
+                                    console.log('Successfully opened URL:', message.url);
+                                } catch (error) {
+                                    console.error('Failed to open URL:', error);
+                                }
                                 break;
                                 
                             case 'error':
