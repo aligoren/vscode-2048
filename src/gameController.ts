@@ -408,8 +408,8 @@ export class GameController {
      */
     private async handleShareScore(shareData: any): Promise<void> {
         try {
-            if (!shareData || !shareData.score) {
-                console.error('Invalid share data received');
+            if (!shareData || typeof shareData.score !== 'number') {
+                console.error('Invalid share data received:', shareData);
                 return;
             }
 
@@ -417,12 +417,10 @@ export class GameController {
             
             // Show platform selection
             const platform = await vscode.window.showQuickPick([
-                { label: '🐦 Twitter/X', value: 'twitter' },
-                { label: '💼 LinkedIn', value: 'linkedin' },
-                { label: '📋 Copy to Clipboard', value: 'clipboard' },
-                { label: '📱 Discord', value: 'discord' }
+                { label: '🐦 Twitter/X\'te paylaş', value: 'twitter' },
+                { label: '📋 Copy to Clipboard', value: 'clipboard' }
             ], {
-                placeHolder: 'Choose platform to share your score'
+                placeHolder: 'Choose how to share your score'
             });
 
             if (!platform) {
@@ -453,41 +451,70 @@ export class GameController {
             let shareText = '';
             let shareUrl = '';
 
-            // Generate share text based on game state
-            if (gameState === 'won') {
-                shareText = `🎉 Just reached ${highestTile} in 2048! Final score: ${score} 🎮 Playing right in VSCode! #VSCode #2048Game #Coding`;
-            } else if (gameState === 'lost') {
-                shareText = `🎮 Just scored ${score} in 2048! Highest tile: ${highestTile} 🔥 Taking a coding break in VSCode! #VSCode #2048Game #Coding`;
+            // Generate share text based on platform
+            if (platform === 'twitter') {
+                if (gameState === 'won') {
+                    shareText = `🎉 Victory in 2048! 🎉
+
+🎯 Final Score: ${score}
+🏆 Highest Tile: ${highestTile}
+🎮 Playing right in VSCode!
+
+Get the extension:
+https://marketplace.visualstudio.com/items?itemName=AliGOREN.vscode-2048
+
+#VSCode #2048Game #Coding #GameDev`;
+                } else if (gameState === 'lost') {
+                    shareText = `🎮 2048 Game Over! 🎮
+
+📊 Final Score: ${score}
+🎯 Highest Tile: ${highestTile}
+🔥 Taking a coding break in VSCode!
+
+Get the extension:
+https://marketplace.visualstudio.com/items?itemName=AliGOREN.vscode-2048
+
+#VSCode #2048Game #Coding #DeveloperLife`;
+                } else {
+                    shareText = `🎮 Playing 2048 in VSCode! 🎮
+
+📊 Current Score: ${score}
+🎯 Highest Tile: ${highestTile}
+🚀 Coding break time!
+
+Get the extension:
+https://marketplace.visualstudio.com/items?itemName=AliGOREN.vscode-2048
+
+#VSCode #2048Game #Coding`;
+                }
             } else {
-                shareText = `🎮 Currently playing 2048 in VSCode! Score: ${score}, Highest: ${highestTile} 🚀 #VSCode #2048Game #Coding`;
+                // Clipboard
+                shareText = `🎮 2048 Game Results 🎮
+
+📊 Score: ${score}
+🎯 Highest Tile: ${highestTile}
+🎮 Status: ${gameState}
+
+Played in VSCode with the 2048 extension!
+Get it here: https://marketplace.visualstudio.com/items?itemName=AliGOREN.vscode-2048`;
             }
 
-            switch (platform) {
-                case 'twitter':
-                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-                    await vscode.env.openExternal(vscode.Uri.parse(shareUrl));
-                    break;
-
-                case 'linkedin':
-                    const linkedinText = `Taking a quick coding break with 2048! 🎮 Score: ${score} | Playing directly in VSCode. Sometimes the best debugging happens during game breaks! 😄 #VSCode #CodingLife #2048`;
-                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://github.com/aligoren/vscode-2048')}&summary=${encodeURIComponent(linkedinText)}`;
-                    await vscode.env.openExternal(vscode.Uri.parse(shareUrl));
-                    break;
-
-                case 'discord':
-                    const discordText = `🎮 **2048 in VSCode!** 🎮\n\n📊 **Score:** ${score}\n🎯 **Highest Tile:** ${highestTile}\n🎲 **Status:** ${gameState === 'won' ? 'Victory! 🎉' : gameState === 'lost' ? 'Game Over 😅' : 'Still Playing 🔥'}\n\n*Playing right in my code editor! Check it out:* https://github.com/aligoren/vscode-2048`;
-                    await vscode.env.clipboard.writeText(discordText);
-                    vscode.window.showInformationMessage('Discord message copied to clipboard! 📋 Paste it in your Discord channel.');
-                    break;
-
-                case 'clipboard':
-                    const clipboardText = `🎮 2048 Game Results 🎮\n\nScore: ${score}\nHighest Tile: ${highestTile}\nStatus: ${gameState}\n\nPlayed in VSCode with the 2048 extension!\nGet it here: https://github.com/aligoren/vscode-2048`;
-                    await vscode.env.clipboard.writeText(clipboardText);
-                    vscode.window.showInformationMessage('Score details copied to clipboard! 📋');
-                    break;
-
-                default:
-                    console.error('Unknown platform:', platform);
+            // Handle platform-specific sharing
+            if (platform === 'twitter') {
+                // Send URL to webview to open Twitter with prefilled text (avoid VSCode crash)
+                const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+                
+                if (this._gameViewProvider) {
+                    this._gameViewProvider.postMessage({
+                        type: 'openBrowser',
+                        url: shareUrl,
+                        platform: 'twitter'
+                    });
+                }
+            } else {
+                // Clipboard only
+                await vscode.env.clipboard.writeText(shareText);
+                vscode.window.showInformationMessage('Score details copied to clipboard! 📋');
             }
 
             // Show success message
